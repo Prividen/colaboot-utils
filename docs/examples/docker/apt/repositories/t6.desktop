@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux TEAM 6
+Name[ru]=Публичный бранч TEAM t6
+X-Sign=t6
+X-Path=/t6/branch
+X-Has-Noarch=yes
+X-Has-Arepo=yes
+X-Components=classic

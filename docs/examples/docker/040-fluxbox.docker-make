@@ -1,0 +1,15 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-lightdm
+
+APT-INIT
+
+APT-INSTALL fluxbox sakura
+
+APT-CLEAN
+
+COMMIT altlinux-p8-clb-fluxbox
+CLEAN
+

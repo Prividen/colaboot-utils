@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=distrib-coffee.ipsl.jussieu.fr
+Comment=Institut Pierre Simon Laplace, France
+X-Country=fr
+X-FTP-URI=ftp://distrib-coffee.ipsl.jussieu.fr/pub/linux/altlinux
+X-HTTP-URI=http://distrib-coffee.ipsl.jussieu.fr/pub/linux/altlinux
+X-RSYNC-URI=rsync://distrib-coffee.ipsl.jussieu.fr/pub/linux/altlinux

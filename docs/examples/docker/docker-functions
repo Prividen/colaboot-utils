@@ -1,0 +1,72 @@
+function err_exit() {
+	echo $1 >&2
+	exit 1
+}
+
+function FROM() {
+	docker images |grep -q "^$1" || err_exit "No such docker image $1 found"
+	CURRENT_CID=$(docker run -dit $1 /bin/bash |cut -c-12)
+	[ -z "$CURRENT_CID" ] && err_exit "Error creating container from image $1"
+	export CURRENT_CID
+	[ "x$DEBUG" = "x1" ] && echo "Container $CURRENT_CID created from image $1"
+	:
+}
+
+function ADD() {
+	[ -z "$CURRENT_CID" ] && err_exit "No CID provided"
+	docker cp $1 ${CURRENT_CID}:$2
+}
+
+function RUN() {
+	[ -z "$CURRENT_CID" ] && err_exit "No CID provided"
+	docker ps |grep -q "^${CURRENT_CID}" || err_exit "Container $CURRENT_CID is not running"
+	[ "x$DEBUG" = "x1" ] && echo "will run: docker exec -it $CURRENT_CID bash -c" $*
+	docker exec -it $CURRENT_CID bash -c "$*"
+}
+
+function APT-INIT() {
+	ADD apt /usr/local/share/apt
+	RUN apt-get update -o Dir::Etc=/usr/local/share/apt
+}
+
+function APT-INSTALL() {
+	RUN apt-get -y -o Dir::Etc=/usr/local/share/apt install $*
+}
+
+function APT-REMOVE() {
+	RUN apt-get -y -o Dir::Etc=/usr/local/share/apt remove $*
+}
+
+function APT-SHELL() {
+	RUN apt-shell -o Dir::Etc=/usr/local/share/apt
+}
+
+function APT-CLEAN() {
+	RUN apt-get clean
+	RUN find /var/lib/apt/ -type f -delete
+	RUN find /var/cache/apt/ -type f -delete
+	RUN rm -rf /usr/local/share/apt
+}
+
+function COMMIT() {
+	[ -z "$CURRENT_CID" ] && err_exit "No CID provided"
+	[ -z "$1" ] && err_exit "Please provide a new image name for commit to"
+	docker images |grep "^$1" && err_exit "$1: this image name already assigned"
+	docker commit $CURRENT_CID $1 >/dev/null && export CURRENT_IMG=$1
+	[ "x$DEBUG" = "x1" -a -n "$CURRENT_IMG" ] && echo "Image $CURRENT_IMG commited from container $CURRENT_CID"
+}
+
+function CLEAN() {
+	[ -z "$CURRENT_CID" ] && err_exit "No CID provided"
+	docker kill $CURRENT_CID >/dev/null
+	docker rm $CURRENT_CID >/dev/null
+	[ "x$DEBUG" = "x1" ] && echo "Container $CURRENT_CID destroyed"
+	unset CURRENT_CID
+	export CURRENT_CID
+}
+
+set -e
+
+trap '[ -n "$CURRENT_CID" ] && echo "Prepared container: $CURRENT_CID";\
+	[ -n "$CURRENT_IMG" ] && echo "Prepared image: $CURRENT_IMG"' EXIT
+

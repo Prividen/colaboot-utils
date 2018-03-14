@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux Platform 7
+Name[ru]=Седьмая платформа
+X-Sign=p7
+X-Path=/p7/branch
+X-Has-Noarch=yes
+X-Components=classic
+X-Has-Arepo=yes

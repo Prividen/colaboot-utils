@@ -1,0 +1,7 @@
+ata_generic
+ata_piix
+pata_acpi
+sr_mod
+sd_mod
+iso9660
+udf

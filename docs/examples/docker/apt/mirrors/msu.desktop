@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=mirror.cs.msu.ru
+Comment=CMC MSU, Moscow, Russia
+X-Country=ru
+X-Repositories=p7;p8;sisyphus
+X-HTTP-URI=http://mirror.cs.msu.ru/alt
+X-RSYNC-URI=rsync://mirror.cs.msu.ru/alt

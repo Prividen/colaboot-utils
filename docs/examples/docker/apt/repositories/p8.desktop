@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux Platform 8
+Name[ru]=Восьмая платформа
+X-Sign=p8
+X-Path=/p8/branch
+X-Has-Noarch=yes
+X-Components=classic
+X-Has-Arepo=yes

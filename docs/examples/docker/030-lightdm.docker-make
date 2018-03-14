@@ -1,0 +1,21 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-xorg
+
+APT-INIT
+
+APT-INSTALL lightdm-gtk-greeter 
+APT-INSTALL fonts-ttf-liberation fonts-bitmap-terminus
+APT-INSTALL pam-ck-connector2 pm-utils polkit
+
+APT-CLEAN
+
+RUN systemctl set-default graphical
+RUN 'sed -i -e "s/^#\(autologin-user=\).*$/\1altlinux/" -e "s/^#\(autologin-user-timeout=0\)/\1/" /etc/lightdm/lightdm.conf'
+RUN '[ -f /etc/rc.d/rc.local ] && rm -f /etc/rc.d/rc.local'
+
+COMMIT altlinux-p8-clb-lightdm
+CLEAN
+

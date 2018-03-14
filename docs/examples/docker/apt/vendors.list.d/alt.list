@@ -1,0 +1,74 @@
+simple-key "alt" {
+	Fingerprint "62A18AD809AD1DDA342978242913F6A180EF7625";
+	Name "ALT Security Team <security@altlinux.org>";
+}
+
+simple-key "security" {
+	Fingerprint "62A18AD809AD1DDA342978242913F6A180EF7625";
+	Name "ALT Security Team <security@altlinux.org>";
+}
+
+simple-key "updates" {
+	Fingerprint "64032F109FD0C4331F572CC0DC9E95C2231114B3";
+	Name "ALT Linux 4.0 updates <updates@altlinux.org>";
+}
+
+simple-key "security-updates" {
+	Group "updates";
+	Fingerprint "62A18AD809AD1DDA342978242913F6A180EF7625";
+	Name "ALT Security Team <security@altlinux.org>";
+}
+
+simple-key "incominger" {
+	Group "alt";
+	Fingerprint "49B01E70C64124E6742EAE7195C584D5AE4AE412";
+	Name "R. E. Gnimocni <incominger@altlinux.org>";
+}
+
+simple-key "backports" {
+	Fingerprint "726FEBB2F5BAFABE1DE2DE3287E99BAB07E9C65D";
+	Name "ALT Linux Backports (4.0) <backports@altlinux.org>";
+}
+
+simple-key "desktop" {
+	Fingerprint "BB1A2759470D34DFC303746A041B09E783724063";
+	Name "Anton V. Boyarshinov <boyarsh@altlinux.ru>";
+}
+
+simple-key "p5" {
+	Fingerprint "BABE2D97B08AF87BD93B899B7AAF040E556DF34A";
+	Name "ALT Linux Platform5 <platform5@altlinux.org>";
+}
+
+simple-key "p5_incominger" {
+	Group "p5";
+	Fingerprint "49B01E70C64124E6742EAE7195C584D5AE4AE412";
+	Name "R. E. Gnimocni <incominger@altlinux.org>";
+}
+
+simple-key "p5_security" {
+	Group "p5";
+	Fingerprint "62A18AD809AD1DDA342978242913F6A180EF7625";
+	Name "ALT Security Team <security@altlinux.org>";
+}
+
+simple-key "p5_updates" {
+	Group "p5";
+	Fingerprint "64032F109FD0C4331F572CC0DC9E95C2231114B3";
+	Name "ALT Linux 4.0 updates <updates@altlinux.org>";
+}
+
+simple-key "p6" {
+	Fingerprint "64032F109FD0C4331F572CC0DC9E95C2231114B3";
+	Name "ALT Linux 4.0 updates <updates@altlinux.org>";
+}
+
+simple-key "p7" {
+	Fingerprint "64032F109FD0C4331F572CC0DC9E95C2231114B3";
+	Name "ALT Linux 4.0 updates <updates@altlinux.org>";
+}
+
+simple-key "p8" {
+	Fingerprint "64032F109FD0C4331F572CC0DC9E95C2231114B3";
+	Name "ALT Linux 4.0 updates <updates@altlinux.org>";
+}

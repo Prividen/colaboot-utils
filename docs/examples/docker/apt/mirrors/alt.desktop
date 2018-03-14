@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ftp.altlinux.org
+Comment=ALT Linux, Moscow
+X-Country=ru
+X-FTP-URI=ftp://ftp.altlinux.org/pub/distributions/ALTLinux
+X-HTTP-URI=http://ftp.altlinux.org/pub/distributions/ALTLinux
+X-RSYNC-URI=rsync://ftp.altlinux.org/ALTLinux

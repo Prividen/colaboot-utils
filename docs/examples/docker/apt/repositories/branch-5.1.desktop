@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux 5.1 stable branch
+Name[ru]=Стабильная ветка ALT Linux 5.1
+X-Sign=updates
+X-Path=/5.1/branch
+X-Has-Noarch=yes
+X-Components=classic

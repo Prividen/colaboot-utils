@@ -1,0 +1,15 @@
+Important:
+  basesystem
+Required:
+  apt
+Standard:
+  gnome-screensaver
+  kernel-doc
+  libpam0
+  libpam0-devel
+  maxima-bin-gcl
+  metacity-gnome
+  postfix
+  python-dev
+  python-modules-tkinter
+  xscreensaver-hacks

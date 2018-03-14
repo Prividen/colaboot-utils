@@ -1,0 +1,27 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-network
+
+APT-INIT
+
+APT-INSTALL xorg-server xinit xinitrc xauth xterm xorg-utils
+APT-INSTALL xorg-dri-intel xorg-dri-nouveau xorg-dri-radeon xorg-dri-virgl
+APT-INSTALL xorg-drv-intel xorg-drv-libinput xorg-drv-nouveau xorg-drv-nv xorg-drv-qxl
+APT-INSTALL xorg-drv-radeon xorg-drv-vmware xorg-drv-vmmouse xorg-drv-synaptics
+
+APT-CLEAN
+
+RUN systemctl set-default multi-user
+RUN "cat > /etc/rc.d/rc.local <<EOT
+#! /bin/bash
+nohup su - -c 'xinit' altlinux >/dev/null 2>/dev/null &
+EOT
+"
+RUN chmod +x /etc/rc.d/rc.local
+
+
+COMMIT altlinux-p8-clb-xorg
+CLEAN
+

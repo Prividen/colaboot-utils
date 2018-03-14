@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=mirror.yandex.ru
+Comment=Yandex, Moscow
+X-Country=ru
+X-FTP-URI=ftp://mirror.yandex.ru/altlinux
+X-HTTP-URI=http://mirror.yandex.ru/altlinux
+X-RSYNC-URI=rsync://mirror.yandex.ru/altlinux

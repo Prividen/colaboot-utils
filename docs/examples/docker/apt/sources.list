@@ -1,0 +1,3 @@
+rpm [p8] http://192.168.123.1/ALTLinux p8/x86_64 classic
+rpm [p8] http://192.168.123.1/ALTLinux p8/x86_64-i586 classic
+rpm [p8] http://192.168.123.1/ALTLinux p8/noarch classic

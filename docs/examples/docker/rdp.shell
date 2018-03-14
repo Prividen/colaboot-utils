@@ -1,0 +1,47 @@
+#!/bin/sh
+
+COMMON_RDP_OPTS='/f /cert-ignore'
+
+function err_msg() {
+	yad --image dialog-error --borders=15 --width=500 --undecorated --center \
+		--text "<span color='red' size='x-large'>\tError:\n</span>\t$1" --button=gtk-ok:0
+}
+
+
+while true; do
+frmdata=$(yad --image remote_access_section --width=450 --borders=15 --undecorated \
+	--center --text "<span size='xx-large'>     Connect to remote desktop:\n</span>" \
+	--form --field='Server' "$frm_host" --field='Username' "$frm_user" \
+	--field='Password:H' "$frm_passw" --field='Domain' "$frm_domain" --field='Gateway' "$frm_gw") 
+
+frm_host=$(echo $frmdata | cut -f1 -d'|')
+frm_user=$(echo $frmdata | cut -f2 -d'|')
+frm_passw=$(echo $frmdata | cut -f3 -d'|')
+frm_domain=$(echo $frmdata | cut -f4 -d'|')
+frm_gw=$(echo $frmdata | cut -f5 -d'|')
+
+if [ -z "$frm_host" ]; then
+	err_msg "Server must be specified"
+	continue
+fi
+
+RDP_OPTS=$COMMON_RDP_OPTS
+[ -n "$frm_host" ] && RDP_OPTS="$RDP_OPTS /v:$frm_host"
+[ -n "$frm_user" ] && RDP_OPTS="$RDP_OPTS /u:$frm_user"
+[ -n "$frm_passw" ] && RDP_OPTS="$RDP_OPTS /p:$frm_passw"
+[ -n "$frm_domain" ] && RDP_OPTS="$RDP_OPTS /d:$frm_domain"
+[ -n "$frm_gw" ] && RDP_OPTS="$RDP_OPTS /g:$frm_gw"
+
+
+RDP_OUTP=$(xfreerdp $RDP_OPTS 2>&1)
+ret=$?
+[ $ret -eq 12 ] && ret=0
+if [ $ret -gt 0 ]; then
+	IFS=
+	RDP_OUTP=$(echo $RDP_OUTP|sed -e 's/.* - //g')
+	IFS=$' \t\n'
+	MSG="Error connecting to the server '$frm_host'"
+	[ -n "$RDP_OUTP" ] && MSG="${MSG}\n\n<span size='x-small'>freerdp output:\n$RDP_OUTP</span>"
+	err_msg "$MSG"
+fi
+done

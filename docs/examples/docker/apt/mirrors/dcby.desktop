@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=mirror.datacenter.by
+Comment=Beltelecom datacenter, Minsk, Belarus
+X-Country=by
+X-Repositories=p6;p7;p8;sisyphus;t6;t7
+X-FTP-URI=ftp://mirror.datacenter.by/pub/ALTLinux
+X-HTTP-URI=http://mirror.datacenter.by/pub/ALTLinux
+X-RSYNC-URI=rsync://mirror.datacenter.by/ALTLinux

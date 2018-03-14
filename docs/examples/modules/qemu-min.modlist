@@ -1,0 +1,11 @@
+virtio_net
+virtio_balloon
+virtio_console
+virtio_pci
+virtio_ring
+virtio
+e1000
+8139cp
+e100
+pcnet32
+ne2k_pci

@@ -1,0 +1,145 @@
+#! /bin/bash
+
+ID=$1
+MODE=${2:-diff}
+
+function usage() {
+	cat << EOT
+Usage: $0 <docker-object> [<mode>]
+<docker-object> - image or container's name or ID.
+<mode> - 
+	diff (default) - export only this layer (object's "upper" dir),
+	merged - export united this layer with all parents (object's "merged" dir)
+	chain - export this layer and all its parents layers in diff mode.
+
+EOT
+}
+
+function err_exit() {
+        [ -n "$1" ] && echo -e "$1\n"
+        usage
+        exit 1
+}
+
+
+function obj_info() {
+	local ID=$1
+	echo Looking docker objects for \"$ID\"...
+	if OBJ=$(docker inspect $ID --type image --format='{{.Id}}' 2>/dev/null) ; then
+		NAME=$(docker inspect $ID --format='{{index .RepoTags 0}}' |sed  -e 's|/|_|g')
+		TYPE=image
+	elif OBJ=$(docker inspect $ID --type container --format='{{.Id}}' 2>/dev/null) ; then
+		NAME=$(docker inspect $ID --format='{{.Name}}' |sed -e 's|^/||' -e 's|/|_|g')
+		TYPE=container
+	fi
+
+	[ -z "$OBJ" ] && err_exit "Found nothing"
+	NAME=$(echo $NAME |sed -e 's/:latest$//')
+
+	# Better to avoid to create such images
+	[ "$NAME" == "<no value>" ] && NAME="no_value"
+
+	echo "Selected object: $OBJ"
+	echo "Type: ${TYPE}; Name: ${NAME}"
+	echo "Selected mode: $MODE"
+}
+
+
+[ `whoami` == 'root' ] || {
+        echo 'Wonna be a root'
+        exit 1
+}
+
+[ -z "$ID" ] && err_exit "Please specify a docker object"
+echo $MODE |grep -Eq "^(diff|merged|chain)$" || err_exit "Wrong mode $MODE"
+
+obj_info $ID
+ID=$(echo $ID | sed -e 's|/|_|g')
+
+case $MODE in 
+	diff)
+		# Get object's UpperDir
+		UDIR=`docker inspect --format='{{.GraphDriver.Data.UpperDir}}' $OBJ`
+		[ -d "$UDIR" ] || err_exit "Can't locate UpperDir for object $OBJ"
+
+		# And export it into squashfs image
+		mksquashfs $UDIR $ID.squashfs -noappend
+		echo "SquashFS diff layer for object $OBJ created: $ID.squashfs"
+		;;
+
+	merged)
+		# Get object's UpperDir
+		UDIR=`docker inspect --format='{{.GraphDriver.Data.UpperDir}}' $OBJ`
+		[ -d "$UDIR" ] || err_exit "Can't locate upper dir for object $OBJ"
+
+		# Get object's LowerDir chain
+		LDIR=`docker inspect --format='{{.GraphDriver.Data.LowerDir}}' $OBJ |sed -e 's|.*-init/diff:||'`
+
+		if [ -z "$LDIR" -o "$LDIR" == "<no value>" ]; then
+			echo "Warning, 'merged' mode selected, but there are no LowerDir for object $OBJ"
+			echo "Only UpperDir will be processed"
+			mksquashfs $UDIR $ID.squashfs -noappend
+			echo "SquashFS diff layer for object $OBJ created: $ID.squashfs"
+			exit
+		else
+			# Split LowerDir into parts and check that every dir from this chain is exist
+			echo $LDIR |tr ":" "\n" |while read LDIR_PART; do
+				[ -d "$LDIR_PART" ] || err_exit "Can't locate LowerDir part $LDIR_PART for object $OBJ"
+			done
+		fi
+
+		# Complete merged chain for mount: UpperDir and all LowerDir chain
+		MOUNTCHAIN="${UDIR}:${LDIR}"
+		TDIR=`mktemp -d`
+
+		# Mount merged chain to temporary dir
+		mount -t overlay overlay -o lowerdir=$MOUNTCHAIN $TDIR || {
+			echo "Error mounting overlays $MOUNTCHAIN for object $OBJ" >&2
+			rmdir $TDIR
+			exit 1
+		}
+
+		# And export it into squashfs image
+		mksquashfs $TDIR ${ID}-merged.squashfs -noappend
+		echo "SquashFS all merged layers for object $OBJ created: $ID.squashfs"
+
+		umount $TDIR
+		rmdir $TDIR
+
+		;;
+	chain)
+		# Look for a parent object, if exists
+		PARENT_OBJ=`docker inspect --format='{{.Parent}}' $OBJ`
+		[ -n "$PARENT_OBJ" ] || err_exit "No parent object found for $OBJ"
+
+		ALL_OBJECTS=$ID
+		MNF_NAME="${ID}.manifest"
+
+		# Make image for current object in a DIFF mode
+		$0 $ID diff
+
+		# While we have a parent object...
+		while [ -n "$PARENT_OBJ" ]; do
+			# Get name for parent's object
+			obj_info $PARENT_OBJ
+			[ -n "$NAME" ] || err_exit "Can't get name for docker object $PARENT_OBJ"
+
+			# Collect all parents names into this variable
+			ALL_OBJECTS="$NAME $ALL_OBJECTS"
+
+			# Make image for current parent object in a DIFF mode
+			$0 $NAME diff
+
+			# Get next parent object
+			PARENT_OBJ=`docker inspect --format='{{.Parent}}' $PARENT_OBJ`
+		done
+
+		# Write a manifest template for initial object and all it's parents
+		[ -f "$MNF_NAME" ] && rm -f $MNF_NAME
+		for L_OBJ in $ALL_OBJECTS; do
+			echo "LAYER=${L_OBJ}" >> $MNF_NAME
+		done
+		echo "Manifest $MNF_NAME created"
+		;;
+esac
+

@@ -1,0 +1,21 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-lightdm
+
+APT-INIT
+
+APT-INSTALL xfce4-minimal
+APT-INSTALL xfce4-terminal xfce4-appfinder thunar
+
+APT-CLEAN
+
+ADD xfce4-settings.tgz /var/tmp/
+RUN "cd /home/altlinux/.config; tar -xf /var/tmp/xfce4-settings.tgz; "
+RUN rm -f /var/tmp/xfce4-settings.tgz
+
+
+COMMIT altlinux-p8-clb-xfce
+CLEAN
+

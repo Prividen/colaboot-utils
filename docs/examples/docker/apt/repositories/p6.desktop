@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux Platform 6
+Name[ru]=Шестая платформа
+X-Sign=p6
+X-Path=/p6/branch
+X-Has-Noarch=yes
+X-Components=classic
+X-Has-Arepo=yes

@@ -1,0 +1,16 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-base
+
+APT-INIT
+
+APT-INSTALL squashfs-tools firmware-linux
+APT-INSTALL kernel-image-un-def kernel-modules-bcmwl-un-def kernel-modules-drm-nouveau-un-def 
+APT-INSTALL kernel-modules-ide-un-def kernel-modules-r8168-un-def kernel-modules-v4l-un-def 
+APT-INSTALL kernel-modules-drm-un-def kernel-modules-drm-ancient-un-def kernel-modules-drm-radeon-un-def 
+APT-INSTALL kernel-modules-kvm-un-def kernel-modules-rtl8723de-un-def kernel-modules-virtualbox-addition-un-def
+
+APT-CLEAN
+

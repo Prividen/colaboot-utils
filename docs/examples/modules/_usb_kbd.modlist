@@ -1,0 +1,10 @@
+usbhid
+usbkbd
+ehci-hcd
+ehci-pci
+xhci-hcd
+hid_generic
+hid
+i2c_hid
+xhci-pci
+input_leds

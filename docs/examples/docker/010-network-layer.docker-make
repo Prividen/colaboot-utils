@@ -1,0 +1,19 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-base
+
+APT-INIT
+
+APT-INSTALL NetworkManager-daemon dhcp-client tcpdump iptables elinks curl netcat rsync
+APT-REMOVE bash-completion
+
+APT-CLEAN
+
+RUN sed -i -e \'s/nullok //\' /etc/pam.d/system-auth-use_first_pass
+RUN systemctl enable NetworkManager
+
+COMMIT altlinux-p8-clb-network
+CLEAN
+

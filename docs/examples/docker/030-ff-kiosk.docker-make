@@ -1,0 +1,74 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-xorg
+
+APT-INIT
+
+APT-INSTALL firefox-esr
+APT-INSTALL livecd-webkiosk-firefox
+APT-INSTALL fonts-ttf-liberation fonts-bitmap-terminus menu-icons-default
+APT-INSTALL unclutter
+
+APT-CLEAN
+
+RUN "cat > /etc/rc.d/rc.local <<EOT
+#! /bin/bash
+nohup su - -c 'xinit /usr/local/bin/ff-kiosk.shell' altlinux >/dev/null 2>/dev/null &
+EOT
+"
+RUN chmod +x /etc/rc.d/rc.local
+
+RUN 'cat > /usr/local/bin/ff-kiosk.shell <<EOT
+#! /bin/bash
+
+if grep -q "url=" /proc/cmdline; then 
+	HOME_URL=\$(sed -e "s/.* url=//" -e "s/ .*//" /proc/cmdline)
+fi
+
+HOME_URL=\${HOME_URL:-http://habrahabr.ru}
+
+ratpoison &
+unclutter &
+/usr/bin/xset s off -dpms
+firefox "\$HOME_URL"
+EOT
+'
+RUN chmod +x /usr/local/bin/ff-kiosk.shell
+
+
+HDIR=/home/altlinux
+RUN mkdir -p ${HDIR}/.mozilla/firefox/kiosk
+RUN mkdir -p \"${HDIR}/.mozilla/firefox/Crash Reports\"
+
+RUN "cat > ${HDIR}/.mozilla/firefox/profiles.ini <<EOT
+[General]
+StartWithLastProfile=1
+
+[Profile0]
+Name=kiosk
+IsRelative=1
+Path=kiosk
+EOT
+"
+
+RUN "cat > ${HDIR}/.mozilla/firefox/kiosk/prefs.js <<EOT
+user_pref(\"browser.shell.checkDefaultBrowser\", false);
+EOT
+"
+
+RUN "cat >${HDIR}/.mozilla/firefox/Crash\ Reports/crashreporter.ini <<EOT
+[Crash Reporter]
+SubmitReport=0
+EOT
+"
+
+RUN cp /etc/skel/.ratpoisonrc /home/altlinux/
+RUN chown -R altlinux: /home/altlinux
+
+RUN rm -rf /etc/net/ifaces/eth0
+
+COMMIT altlinux-p8-clb-ff-kiosk
+CLEAN
+

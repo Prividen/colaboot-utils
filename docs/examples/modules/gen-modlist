@@ -1,0 +1,4 @@
+#! /bin/bash
+
+lsmod |tail -n +2 |cut -f1 -d' ' | sort
+

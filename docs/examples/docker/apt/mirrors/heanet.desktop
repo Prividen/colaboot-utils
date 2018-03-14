@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ftp.heanet.ie
+Comment=HEAnet, Ireland
+X-Country=ie
+X-FTP-URI=ftp://ftp.heanet.ie/mirrors/ftp.altlinux.org
+X-HTTP-URI=http://ftp.heanet.ie/mirrors/ftp.altlinux.org
+X-RSYNC-URI=rsync://ftp.heanet.ie/mirrors/ftp.altlinux.org

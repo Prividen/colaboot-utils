@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux TEAM 7
+Name[ru]=Публичный бранч TEAM t7
+X-Sign=t7
+X-Path=/t7/branch
+X-Has-Noarch=yes
+X-Has-Arepo=yes
+X-Components=classic

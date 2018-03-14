@@ -1,0 +1,18 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-lightdm
+
+APT-INIT
+
+APT-INSTALL openbox pcmanfm2 eject
+APT-INSTALL lxde-common lxde-lxpanel lxde-lxsession lxde-lxsession-edit lxde-lxrandr lxde-lxtask
+APT-INSTALL lxde-lxappearance lxde-lxappearance-obconf lxde-lxshortcut lxde-lxinput lxde-lxhotkey
+APT-INSTALL lxde-settings-upstream lxde-icon-theme tango-icon-theme lxde-lxlauncher lxde-lxterminal
+
+APT-CLEAN
+
+COMMIT altlinux-p8-clb-lxde
+CLEAN
+

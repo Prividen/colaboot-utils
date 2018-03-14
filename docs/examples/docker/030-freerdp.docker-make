@@ -1,0 +1,25 @@
+#! /bin/bash
+
+. docker-functions
+
+FROM altlinux-p8-clb-xorg
+
+APT-INIT
+
+APT-INSTALL freerdp freerdp-plugins-standard xfreerdp
+APT-INSTALL yad
+APT-INSTALL fonts-ttf-liberation fonts-bitmap-terminus menu-icons-default
+
+APT-CLEAN
+
+ADD rdp.shell /usr/local/bin/
+RUN "cat > /etc/rc.d/rc.local <<EOT
+#! /bin/bash
+nohup su - -c 'xinit /usr/local/bin/rdp.shell' altlinux >/dev/null 2>/dev/null &
+EOT
+"
+RUN chmod +x /etc/rc.d/rc.local
+
+COMMIT altlinux-p8-clb-freerdp
+CLEAN
+

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux Sisyphus
+X-Sign=alt
+X-Path=/Sisyphus
+X-Has-Noarch=yes
+X-Has-Arepo=yes
+X-Components=classic

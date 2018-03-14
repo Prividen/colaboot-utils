@@ -1,0 +1,157 @@
+#! /bin/bash
+
+function usage() {
+	echo -e "Usage:"
+	echo "$0 <kernel> <img-type> <modules-list-file> [<docker-container-id>]"
+	echo "img-type: squashfs, cpio"
+	echo "if <docker-container-id> is specified, this script will be run inside this container."
+	echo "otherwise it will be run in your host system."
+}
+
+function err_exit() {
+	[ -n "$1" ] && echo -e "$1\n"
+	usage
+	exit 1
+}
+
+function mod_dep_info() {
+	local MODNAME=$1
+
+	# Get full path to a module file. Must be exist.
+	local MODPATH=$(modinfo -k $KERN_VER -F filename $MODNAME)
+	[ -z "$MODPATH" ] && return 1
+
+	# Get list of firmware files, required for this module
+	local FIRMWARE=$(modinfo -k $KERN_VER -F firmware $MODNAME)
+
+	# Get list of dependencies modules.
+	local DEPMODS=$(modinfo  -k $KERN_VER -F depends $MODNAME)
+	
+	# If we have dependencies modules, then recursively get full path of them, 
+	# its firmwares and further dependencies.
+	if [ -n "$DEPMODS" ]; then
+		for MODULE in $(echo $DEPMODS |tr ',' ' '); do
+			 mod_dep_info $MODULE
+		done
+	fi
+
+	# Print results on STDOUT
+	echo $MODPATH
+
+	if [ -n "$FIRMWARE" ]; then
+		for FW_FILE in $FIRMWARE; do
+			echo "/lib/firmware/$FW_FILE"
+		done
+	fi
+}
+
+[ `whoami` == 'root' ] || {
+	echo 'Wonna be a root'
+	exit 1
+}
+
+[ -w "." ] || err_exit "Current directory is not writable"
+
+[ -z "$1" ] && err_exit "Please specify kernel version (e.g. \`uname -r\`)"
+KERN_VER=$1
+	
+[ -z "$2" ] && err_exit "Please specify image type (squashfs/cpio)"
+IMG_TYPE=$2
+echo $IMG_TYPE |grep -E -q "^(squashfs|cpio)$" || err_exit "Unsupported image type $IMG_TYPE"
+
+[ -z "$3" ] && err_exit "Please specify modules list file"
+MODLIST="$3"
+[ -r "$MODLIST" ] || err_exit "Can't read modules list file $MODLIST"
+
+IMG_NAME="$(basename ${MODLIST}).${KERN_VER}.${IMG_TYPE}"
+
+# If docker CID specified...
+if [ -n "$4" ]; then
+	CID=$4
+
+	# this container must be exist and running
+	if ! docker ps |tail +2 |grep -q "^$CID " ; then
+		err_exit "No running docker container $CID found"
+	fi
+
+	# Copy this script and modlist inside the container
+	docker cp $0 $CID:/usr/local/bin/
+	docker cp $MODLIST $CID:/var/tmp/
+
+	echo $(basename $0) will be executed in container $CID.
+
+	# Run this script inside container, work dir: /var/tmp
+	docker exec $CID bash -c "cd /var/tmp; /usr/local/bin/$(basename $0) $KERN_VER $IMG_TYPE /var/tmp/$(basename $MODLIST)"
+	[ $? -gt 0 ] && err_exit "Error creating image with modules"
+
+	# And copy results back into host system, to the current dir
+	echo "Copying modules image from container to the current directory..."
+	docker cp $CID:/var/tmp/$IMG_NAME ./
+	ls -l ./$IMG_NAME
+	exit $?
+fi
+
+# Check if required kernel version is installed
+[ -d /lib/modules/$KERN_VER -a -r /lib/modules/$KERN_VER ] || {
+	err_exit "Can't read /lib/modules/$KERN_VER dir, wrong kernel version?"
+}
+
+DO_DEPMOD=0
+if [ "$IMG_TYPE" == "squashfs" ]; then
+	MKSQAUSH=$(which mksquashfs)
+	[ -z "$MKSQAUSH" ] && err_exit "For image type '$IMG_TYPE' there are mksquashfs utility required."
+	DO_DEPMOD=1
+fi
+
+
+TDIR=`mktemp -d`
+# Clean tmp dir if exit by error
+trap 'rm -rf "${TDIR}" >/dev/null 2>&1; echo "Emergency exit on error" >&2; exit 1' TERM INT
+
+echo "Copy modules..."
+cat $MODLIST |while read MODULE; do
+	if echo $MODULE |grep -q "^/"; then
+		# If it absolute path then just copy this file
+		FILE=$MODULE
+		[ -r "$FILE" ] || {
+			echo "File $FILE not found, stop" >&2
+			kill $$
+			exit 1
+		}
+		echo $FILE
+	else
+		# Module name assumed
+		if ! mod_dep_info $MODULE; then
+			echo "Module $MODULE not found, stop" >&2
+			kill $$
+			exit 1
+		fi
+	fi
+# Get list of found modules & firmware on STDIN and copy each file to temporary dir.
+# Some of (firmware) files can be missed.
+done | sort -u |xargs -I {} install -D -m 0600 {} ${TDIR}/{}
+
+
+if [ $DO_DEPMOD -eq 1 ]; then
+	# Will run depmod only for squashfs images.
+	echo "Generating module dependencies in image ..."
+	depmod -a -F "/boot/System.map-$KERN_VER" -b $TDIR $KERN_VER
+fi
+
+echo "Packing image..."
+
+if [ "$IMG_TYPE" == "squashfs" ]; then
+	mksquashfs $TDIR $IMG_NAME -noappend
+elif [ "$IMG_TYPE" == "cpio" ]; then
+	CUR_DIR=$PWD; 
+	pushd $TDIR; 
+	find . -print0 | cpio --null -ov --format=newc | gzip -9 > $CUR_DIR/$IMG_NAME
+	popd
+fi
+
+rm -rf $TDIR
+
+echo $IMG_TYPE image created: $IMG_NAME
+
+
+

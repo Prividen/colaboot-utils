@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=sisyphus
+Terminal=false
+Name=ALT Linux Platform 5
+Name[ru]=Пятая платформа
+X-Sign=p5
+X-Path=/p5/branch
+X-Has-Noarch=yes
+X-Components=classic
