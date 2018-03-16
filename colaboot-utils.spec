@@ -1,5 +1,3 @@
-%add_findreq_skiplist %_bindir/*
-
 Name: colaboot-utils
 Version: 0.5
 Release: alt2
@@ -11,10 +9,8 @@ Packager: Michael A. Kangin <prividen@altlinux.org>
 
 Source0: %name-%version.tar
 
-Requires: squashfs-tools docker-ce
-Requires: coreutils, cpio, findutils, grep, gzip, kmod, mount
-
-BuildArch: noarch
+# due dependency on Docker
+ExclusiveArch: x86_64
 
 %description
 CoLaBoot (Compressed Layers Boot) allow to boot host with a separate
