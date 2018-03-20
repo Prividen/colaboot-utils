@@ -1,6 +1,6 @@
 Name: colaboot-utils
 Version: 0.5
-Release: alt2.1
+Release: alt3
 
 Summary: Utils that helps to prepare CoLaBoot images
 License: GPL
@@ -32,6 +32,9 @@ install -m 755 modlist2image docker2squash %buildroot%_bindir/
 %doc docs/*
 
 %changelog
+* Tue Mar 20 2018 Michael A. Kangin <prividen@altlinux.org> 0.5-alt3
+- Homepage URL
+
 * Fri Mar 16 2018 Michael A. Kangin <prividen@altlinux.org> 0.5-alt2.1
 - Fix dependencies again
 
