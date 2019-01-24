@@ -63,7 +63,7 @@ echo $IMG_TYPE |grep -E -q "^(squashfs|cpio)$" || err_exit "Unsupported image ty
 MODLIST="$3"
 [ -r "$MODLIST" ] || err_exit "Can't read modules list file $MODLIST"
 
-IMG_NAME="$(basename ${MODLIST}).${KERN_VER}.${IMG_TYPE}"
+IMG_NAME="$(basename ${MODLIST}|sed -e 's/modlist/modules/').${KERN_VER}.${IMG_TYPE}"
 
 # If docker CID specified...
 if [ -n "$4" ]; then
@@ -75,8 +75,8 @@ if [ -n "$4" ]; then
 	fi
 
 	# Copy this script and modlist inside the container
-	docker cp $0 $CID:/usr/local/bin/
-	docker cp $MODLIST $CID:/var/tmp/
+	docker cp -L $0 $CID:/usr/local/bin/
+	docker cp -L $MODLIST $CID:/var/tmp/
 
 	echo $(basename $0) will be executed in container $CID.
 
@@ -109,7 +109,7 @@ TDIR=`mktemp -d`
 trap 'rm -rf "${TDIR}" >/dev/null 2>&1; echo "Emergency exit on error" >&2; exit 1' TERM INT
 
 echo "Copy modules..."
-cat $MODLIST |while read MODULE; do
+cat $MODLIST | grep -E "^[a-zA-Z0-9/]" | while read MODULE; do
 	if echo $MODULE |grep -q "^/"; then
 		# If it absolute path then just copy this file
 		FILE=$MODULE
