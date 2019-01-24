@@ -82,7 +82,7 @@ if [ -n "$4" ]; then
 	CID=$4
 
 	# this container must be exist and running
-	if ! docker ps |tail +2 |grep -q "^$CID " ; then
+	if ! docker ps |tail -n +2 |grep -q "^$CID " ; then
 		err_exit "No running docker container $CID found"
 	fi
 
