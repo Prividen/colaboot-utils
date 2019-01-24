@@ -137,7 +137,7 @@ case $MODE in
 		# Write a manifest template for initial object and all it's parents
 		[ -f "$MNF_NAME" ] && rm -f $MNF_NAME
 		for L_OBJ in $ALL_OBJECTS; do
-			echo "LAYER=${L_OBJ}" >> $MNF_NAME
+			echo "LAYER=${L_OBJ}.squashfs" >> $MNF_NAME
 		done
 		echo "Manifest $MNF_NAME created"
 		;;
