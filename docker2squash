@@ -63,7 +63,7 @@ case $MODE in
 		[ -d "$UDIR" ] || err_exit "Can't locate UpperDir for object $OBJ"
 
 		# And export it into squashfs image
-		mksquashfs $UDIR $ID.squashfs -noappend
+		mksquashfs $UDIR $ID.squashfs -noappend -comp xz
 		echo "SquashFS diff layer for object $OBJ created: $ID.squashfs"
 		;;
 
@@ -78,7 +78,7 @@ case $MODE in
 		if [ -z "$LDIR" -o "$LDIR" == "<no value>" ]; then
 			echo "Warning, 'merged' mode selected, but there are no LowerDir for object $OBJ"
 			echo "Only UpperDir will be processed"
-			mksquashfs $UDIR $ID.squashfs -noappend
+			mksquashfs $UDIR $ID.squashfs -noappend -comp xz
 			echo "SquashFS diff layer for object $OBJ created: $ID.squashfs"
 			exit
 		else
@@ -100,7 +100,7 @@ case $MODE in
 		}
 
 		# And export it into squashfs image
-		mksquashfs $TDIR ${ID}-merged.squashfs -noappend
+		mksquashfs $TDIR ${ID}-merged.squashfs -noappend -comp xz
 		echo "SquashFS all merged layers for object $OBJ created: $ID.squashfs"
 
 		umount $TDIR
