@@ -22,7 +22,14 @@ function mod_dep_info() {
 
 	# Get full path to a module file. Must be exist.
 	local MODPATH=$(modinfo -k $KERN_VER -F filename $MODNAME)
-	[ -z "$MODPATH" ] && return 1
+	if [ -z "$MODPATH" ]; then
+		echo -n "Will lookup '$MODNAME' in buildin modules... " >&2
+		# There are a great mess with - and _ in module names
+		MODNAME=$(echo $MODNAME | sed -r -e 's/[_-]/[_-]/g')
+		[ -r "$BUILDIN_MODULES" ] && grep -q "/${MODNAME}\.ko$" $BUILDIN_MODULES && echo "found." >&2
+		# if found, will not print a module name, but return without error. Otherwise, return with error.
+		return $?
+	fi
 
 	# Get list of firmware files, required for this module
 	local FIRMWARE=$(modinfo -k $KERN_VER -F firmware $MODNAME)
@@ -67,6 +74,8 @@ MODLIST="$3"
 [ -r "$MODLIST" ] || err_exit "Can't read modules list file $MODLIST"
 
 IMG_NAME="$(basename ${MODLIST}|sed -e 's/modlist/modules/').${KERN_VER}.${IMG_TYPE}"
+
+BUILDIN_MODULES="/lib/modules/${KERN_VER}/modules.builtin"
 
 # If docker CID specified...
 if [ -n "$4" ]; then
