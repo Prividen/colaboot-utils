@@ -1,5 +1,8 @@
 #! /bin/bash
 
+metafiles_cpio="/lib/modules/__KV__/modules.builtin /lib/modules/__KV__/modules.order"
+metafiles_squashfs="$metafiles_cpio /boot/System.map-__KV__ /boot/config-__KV__"
+
 function usage() {
 	echo -e "Usage:"
 	echo "$0 <kernel> <img-type> <modules-list-file> [<docker-container-id>]"
@@ -131,11 +134,21 @@ cat $MODLIST | grep -E "^[a-zA-Z0-9/]" | while read MODULE; do
 # Some of (firmware) files can be missed.
 done | sort -u |xargs -I {} install -D -m 0600 {} ${TDIR}/{}
 
+METAFILES="$(eval "echo \$metafiles_$IMG_TYPE")"
+
+for MF in $METAFILES; do
+	MF=$(echo $MF |sed -e "s/__KV__/$KERN_VER/g")
+	if [ ! -r "$MF" ]; then
+		echo "File $MF not found, stop" >&2
+		exit 1
+	fi
+	install -D -m 0644 $MF ${TDIR}/${MF}
+done
 
 if [ $DO_DEPMOD -eq 1 ]; then
 	# Will run depmod only for squashfs images.
 	echo "Generating module dependencies in image ..."
-	depmod -a -F "/boot/System.map-$KERN_VER" -b $TDIR $KERN_VER
+	depmod -a -b $TDIR $KERN_VER
 fi
 
 echo "Packing image..."
@@ -145,7 +158,7 @@ if [ "$IMG_TYPE" == "squashfs" ]; then
 elif [ "$IMG_TYPE" == "cpio" ]; then
 	CUR_DIR=$PWD; 
 	pushd $TDIR; 
-	find . -print0 | cpio --null -ov --format=newc | gzip -9 > $CUR_DIR/$IMG_NAME
+	find . -print0 | cpio --null -o --format=newc | gzip -9 > $CUR_DIR/$IMG_NAME
 	popd
 fi
 
