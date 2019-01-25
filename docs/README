@@ -1,16 +1,24 @@
-CoLaBoot (Compressed Layers Boot) is a boot system that allow you to mount root
-FS as OverlayFS from a separate layers, each of them is compressed squashfs image.
+CoLaBoot (Compressed Layers Boot, CLB) is a boot system that mount rootfs as
+OverlayFS from separate layers, each of them is compressed squashfs image.
 
-Kernel modules, required for boot (e.g. network modules) may be added to initrd
-or provided as a separate initramfs image. All other modules may be provided as
-one of the layers.
+Kernel modules, required for boot, must be provided as a separate initramfs
+image. These boot modules can be a drivers for network cards, disk devices, file
+systems, etc.
 
-There are two scripts in this package that helps to prepare CoLaBoot images:
-- docker2squash - prepare squashfs image from Docker object (image or container);
+Any other modules for your system should be provided as a SquashFS layer(s), or
+be embedded into the only layer that you have.
+
+SquashFS layers can be pre-existent images (e.g. from distributive ISO -
+live, rescue), or you can prepare them manually, by compressing required
+directories (e.g. /lib/firmware), or it can be obtained from Docker object
+(container or image).
+
+There are two scripts in this package that helps to prepare squashfs layers and
+module images:
+- docker2squash - prepare squashfs layer image from Docker object (image or container);
 - modlist2image - prepare squashfs or cpio image with kernel modules, based on
-  list-of-modules file. Cpio images may be linked to initrd during boot, and
-  squashfs images may be loaded as one of the CoLaBoot layers.
-
+  list-of-modules (.modlist) file. Cpio images can be linked to initrd during
+  boot, and squashfs images can be loaded as one of the CoLaBoot layers.
 
 Also please look on examples of .modlist and docker-make files.
 
