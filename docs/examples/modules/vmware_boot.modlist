@@ -1,0 +1,8 @@
+# set of modules for network boot VMware virtual machines
+vmxnet3
+e1000
+pcnet32
+squashfs
+overlay
+af_packet
+loop

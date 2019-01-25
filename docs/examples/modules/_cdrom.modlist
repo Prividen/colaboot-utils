@@ -1,3 +1,4 @@
+# part of modules, required for boot from cdrom devices.
 ata_generic
 ata_piix
 pata_acpi

@@ -1,3 +1,4 @@
+# set of modules for network boot NUC computers
 usbhid
 usbkbd
 ehci-hcd
@@ -10,3 +11,7 @@ xhci-pci
 input_leds
 e1000e
 r8169
+af_packet
+loop
+overlay
+squashfs

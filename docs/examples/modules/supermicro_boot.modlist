@@ -1,0 +1,22 @@
+# set of modules for network boot Supermicro servers (*026,*027,*028 platforms)
+usbhid
+usbkbd
+ehci-hcd
+ehci-pci
+xhci-hcd
+uhci-hcd
+hid_generic
+hid
+i2c_hid
+xhci-pci
+input_leds
+igb
+e1000
+i40e
+e1000e
+ixgb
+ixgbe
+squashfs
+overlay
+af_packet
+loop

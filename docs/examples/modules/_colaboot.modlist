@@ -1,0 +1,5 @@
+# part of modules, required for CoLaBoot itself
+af_packet
+loop
+overlay
+squashfs

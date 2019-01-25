@@ -1,10 +1,16 @@
+# part of modules, required to have USB keyboard in initrd.
 usbhid
 usbkbd
-ehci-hcd
-ehci-pci
-xhci-hcd
 hid_generic
 hid
+evdev
 i2c_hid
-xhci-pci
 input_leds
+ehci-hcd
+ehci-pci
+ohci-hcd
+ohci-pci
+uhci-hcd
+xhci-hcd
+xhci-pci
+

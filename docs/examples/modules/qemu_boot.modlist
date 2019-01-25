@@ -1,0 +1,14 @@
+# set of modules for network boot QEMU/KVM virtual machines
+virtio_net
+virtio_pci
+virtio_ring
+virtio
+e1000
+8139cp
+e100
+pcnet32
+ne2k_pci
+squashfs
+overlay
+af_packet
+loop
