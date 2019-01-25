@@ -33,6 +33,10 @@ function APT-INSTALL() {
 	RUN apt-get -y -o Dir::Etc=/usr/local/share/apt install $*
 }
 
+function APT-DIST-UPGRADE() {
+	RUN apt-get -y -o Dir::Etc=/usr/local/share/apt dist-upgrade
+}
+
 function APT-REMOVE() {
 	RUN apt-get -y -o Dir::Etc=/usr/local/share/apt remove $*
 }
