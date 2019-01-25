@@ -60,6 +60,7 @@ function COMMIT() {
 	docker images |grep "^$1" && err_exit "$1: this image name already assigned"
 	docker commit $CURRENT_CID $1 >/dev/null && export CURRENT_IMG=$1
 	[ "x$DEBUG" = "x1" -a -n "$CURRENT_IMG" ] && echo "Image $CURRENT_IMG commited from container $CURRENT_CID"
+	[ -n "$CURRENT_IMG" ]
 }
 
 function CLEAN() {
