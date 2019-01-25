@@ -1,3 +1,5 @@
+[ -r _project_settings ] && . _project_settings
+
 function err_exit() {
 	echo $1 >&2
 	exit 1
