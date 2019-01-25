@@ -54,6 +54,43 @@ function APT-CLEAN() {
 	RUN rm -rf /usr/local/share/apt
 }
 
+function YUM-INIT() {
+	if [ -n "$PROJECT_LOCAL_REPOS_URL" ]; then
+		INIT_REPOS=${PROJECT_REPOS:-centos}
+		RUN mkdir /tmp/repos.d
+		for repo in $INIT_REPOS; do 
+			RUN curl $PROJECT_LOCAL_REPOS_URL/$repo.repo -o /tmp/repos.d/$repo.repo
+		done
+	else
+		RUN ln -s /etc/yum.repos.d /tmp/repos.d
+	fi
+}
+
+function YUM-INSTALL() {
+	RUN yum --setopt=reposdir=/tmp/repos.d -y install $*
+}
+
+function YUM-GROUPINSTALL() {
+	RUN yum --setopt=reposdir=/tmp/repos.d -y groupinstall $*
+}
+
+function YUM-UPDATE() {
+	RUN yum --setopt=reposdir=/tmp/repos.d -y update $*
+}
+
+function YUM-REMOVE() {
+	RUN yum --setopt=reposdir=/tmp/repos.d -y remove $*
+}
+
+function YUM-SHELL() {
+	RUN yum --setopt=reposdir=/tmp/repos.d shell
+}
+
+function YUM-CLEAN() {
+	RUN yum --setopt=reposdir=/tmp/repos.d clean all
+	RUN rm -rf /var/cache/yum /tmp/repos.d
+}
+
 function COMMIT() {
 	[ -z "$CURRENT_CID" ] && err_exit "No CID provided"
 	[ -z "$1" ] && err_exit "Please provide a new image name for commit to"
